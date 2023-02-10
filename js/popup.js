@@ -66,8 +66,9 @@ const downloadByTrackId = async (trackId, name, downloadNow = true) => {
 
   console.log("vip专辑，请先登录");
   const vipUrl = await getVipAudioUrl(trackId);
-  vipUrl && downloadNow && downloadFile(vipUrl, name);
-  return vipUrl;
+  console.log("url = " + vipUrl);
+  let flag = vipUrl && downloadNow && downloadFile(vipUrl, name);
+  return flag;
 };
 
 $(document).ready(function () {
@@ -125,9 +126,8 @@ $(document).ready(function () {
       const params = url.split("/");
       const albumId = params[params.length - 1];
       console.log(params, `albumId=${albumId}`);
-      let albumUrl = `http://mobile.ximalaya.com/mobile/v1/album/track/ts-${
-        Date.now() * 1000
-      }?albumId=${albumId}&device=android&isAsc=true&isQueryInvitationBrand=true&pageId=1&pageSize=1&pre_page=0`;
+      let albumUrl = `http://mobile.ximalaya.com/mobile/v1/album/track/ts-${Date.now() * 1000
+        }?albumId=${albumId}&device=android&isAsc=true&isQueryInvitationBrand=true&pageId=1&pageSize=1&pre_page=0`;
 
       const res = await getPromise(albumUrl);
       const count = res.data.totalCount;
@@ -149,9 +149,8 @@ $(document).ready(function () {
       const len = lastPageSize === 0 ? iter : iter + 1;
       let tracks = [];
       for (let index = 1; index <= len; index++) {
-        albumUrl = `http://mobile.ximalaya.com/mobile/v1/album/track/ts-${
-          Date.now() * 1000
-        }?albumId=${albumId}&device=android&isAsc=true&isQueryInvitationBrand=true&pageId=${index}&pageSize=${200}&pre_page=0`;
+        albumUrl = `http://mobile.ximalaya.com/mobile/v1/album/track/ts-${Date.now() * 1000
+          }?albumId=${albumId}&device=android&isAsc=true&isQueryInvitationBrand=true&pageId=${index}&pageSize=${200}&pre_page=0`;
         const res2 = await getPromise(albumUrl);
         console.log("res2", res2);
         await sleep(500);
@@ -165,9 +164,8 @@ $(document).ready(function () {
         <tr class="table-download-row">
           <td>${index + 1}</td>
           <td>${t.title}</td>
-          <td class="table-download-col"><button id="btn-${t.trackId}" name="${
-            t.title
-          }" type="button" class="table-download-btn btn btn-link btn-sm">下载</button></td>
+          <td class="table-download-col"><button id="btn-${t.trackId}" name="${t.title
+            }" type="button" class="table-download-btn btn btn-link btn-sm">下载</button></td>
         </tr>
         `;
         })
@@ -217,16 +215,23 @@ $(document).ready(function () {
           const prefixIndex =
             +prefixZeroNum > index ? 0 : index - +prefixZeroNum + 1;
           const name = hasPrefix
-            ? `${prefixZero(prefixIndex, count.toString().length)}-${
-                track.title
-              }`
+            ? `${prefixZero(prefixIndex, count.toString().length)}-${track.title
+            }`
             : track.title;
-          await downloadByTrackId(track.trackId, name + ".m4a");
+          let result = await downloadByTrackId(track.trackId, name + ".m4a");
+          if (!result) {
+            // 出现异常，中断下载
+            console.log("获取下载地址异常");
+            break;
+          }
           $("#albumAudioRecognizeAlerts").html(
             `<div class="alerts">开始下载-${name}</div>`
           );
           localStorage.setItem(albumId, index + 1);
-          await sleep(1000);
+          // 加入随机时间间隔
+          let delay = Math.ceil(Math.random() * 50 + 10)
+          console.log("等待 " + delay + " 秒……");
+          await sleep(delay * 1000);
         }
         $("#albumAudioRecognizeAlerts").html(
           `<div class="alerts">专辑音频全部下载完成</div>`
@@ -252,6 +257,7 @@ function downloadFile(url, filename) {
   getBlob(url, function (blob) {
     saveAs(blob, filename);
   });
+  return true;
 }
 function getBlob(url, cb) {
   var xhr = new XMLHttpRequest();
@@ -300,7 +306,7 @@ function unknown(e, t, n) {
           null == e
             ? null
             : ("undefined" != typeof Symbol && e[Symbol.iterator]) ||
-              e["@@iterator"];
+            e["@@iterator"];
         if (null == n) return;
         var r,
           o,
@@ -372,7 +378,7 @@ function unknown(e, t, n) {
     cg_hun: function () {
       this._cgStr = "";
       var e =
-          "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/\\:._-1234567890",
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/\\:._-1234567890",
         t = e.length,
         n = 0;
       for (n = 0; n < t; n++) {
@@ -416,74 +422,74 @@ function unknown(e, t, n) {
     ];
   const getEncryptedFileParams = function (e) {
     var t = r(
-        a(
-          (function (e, t) {
-            for (var n = [], r = 0; r < e.length; r++) {
-              for (
-                var o =
-                    "a" <= e[r] && "z" >= e[r]
-                      ? e[r].charCodeAt() - 97
-                      : e[r].charCodeAt() - 48 + 26,
-                  a = 0;
-                36 > a;
-                a++
-              )
-                if (t[a] == o) {
-                  o = a;
-                  break;
-                }
-              n[r] =
-                25 < o
-                  ? String.fromCharCode(o - 26 + 48)
-                  : String.fromCharCode(o + 97);
-            }
-            return n.join("");
-          })("d" + c + "9", u),
-          (function (e) {
-            if (!e) return "";
-            var t,
-              n,
-              r,
-              o,
-              a,
-              i = [
-                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63,
-                52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1,
-                -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-                17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1, -1, 26,
-                27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,
-                43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1,
-              ];
-            for (o = (e = e.toString()).length, r = 0, a = ""; r < o; ) {
-              do {
-                t = i[255 & e.charCodeAt(r++)];
-              } while (r < o && -1 == t);
-              if (-1 == t) break;
-              do {
-                n = i[255 & e.charCodeAt(r++)];
-              } while (r < o && -1 == n);
-              if (-1 == n) break;
-              a += String.fromCharCode((t << 2) | ((48 & n) >> 4));
-              do {
-                if (61 == (t = 255 & e.charCodeAt(r++))) return a;
-                t = i[t];
-              } while (r < o && -1 == t);
-              if (-1 == t) break;
-              a += String.fromCharCode(((15 & n) << 4) | ((60 & t) >> 2));
-              do {
-                if (61 == (n = 255 & e.charCodeAt(r++))) return a;
-                n = i[n];
-              } while (r < o && -1 == n);
-              if (-1 == n) break;
-              a += String.fromCharCode(((3 & t) << 6) | n);
-            }
-            return a;
-          })(e)
-        ).split("-"),
-        4
-      ),
+      a(
+        (function (e, t) {
+          for (var n = [], r = 0; r < e.length; r++) {
+            for (
+              var o =
+                "a" <= e[r] && "z" >= e[r]
+                  ? e[r].charCodeAt() - 97
+                  : e[r].charCodeAt() - 48 + 26,
+              a = 0;
+              36 > a;
+              a++
+            )
+              if (t[a] == o) {
+                o = a;
+                break;
+              }
+            n[r] =
+              25 < o
+                ? String.fromCharCode(o - 26 + 48)
+                : String.fromCharCode(o + 97);
+          }
+          return n.join("");
+        })("d" + c + "9", u),
+        (function (e) {
+          if (!e) return "";
+          var t,
+            n,
+            r,
+            o,
+            a,
+            i = [
+              -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+              -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+              -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63,
+              52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1,
+              -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+              17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1, -1, 26,
+              27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,
+              43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1,
+            ];
+          for (o = (e = e.toString()).length, r = 0, a = ""; r < o;) {
+            do {
+              t = i[255 & e.charCodeAt(r++)];
+            } while (r < o && -1 == t);
+            if (-1 == t) break;
+            do {
+              n = i[255 & e.charCodeAt(r++)];
+            } while (r < o && -1 == n);
+            if (-1 == n) break;
+            a += String.fromCharCode((t << 2) | ((48 & n) >> 4));
+            do {
+              if (61 == (t = 255 & e.charCodeAt(r++))) return a;
+              t = i[t];
+            } while (r < o && -1 == t);
+            if (-1 == t) break;
+            a += String.fromCharCode(((15 & n) << 4) | ((60 & t) >> 2));
+            do {
+              if (61 == (n = 255 & e.charCodeAt(r++))) return a;
+              n = i[n];
+            } while (r < o && -1 == n);
+            if (-1 == n) break;
+            a += String.fromCharCode(((3 & t) << 6) | n);
+          }
+          return a;
+        })(e)
+      ).split("-"),
+      4
+    ),
       n = t[0];
     return {
       sign: t[1],
