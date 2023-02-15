@@ -230,6 +230,7 @@ $(document).ready(function () {
           localStorage.setItem(albumId, index + 1);
           // 加入随机时间间隔
           let delay = Math.ceil(Math.random() * 50 + 10)
+          delay = 5;
           console.log("等待 " + delay + " 秒……");
           await sleep(delay * 1000);
         }
